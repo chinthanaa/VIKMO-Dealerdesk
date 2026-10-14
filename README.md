@@ -1,19 +1,17 @@
 # VIKMO DealerDesk
 
-**Track: django**
+**Track: Django**
 
-A Django and PostgreSQL backend for managing a motorcycle and car parts distributor's catalogue, dealers, orders, and supplier integration.
+A Django and PostgreSQL backend for managing a motorcycle and car parts distributor's catalogue, dealers, orders, inventory, and supplier integration.
 
 ## Implemented Components
 
 - Product catalogue and dealer APIs
 - Draft order creation and retrieval
 - Order validation and lifecycle handling
-- Inventory and GST calculations
+- Inventory management and GST calculations
 - Supplier catalogue synchronization with pagination and retry handling
 - Consistent JSON API error responses
-
-**Known limitation:** Supplier synchronization currently returns HTTP 502 during testing and needs further verification.
 
 ## Technology Stack
 
@@ -37,30 +35,61 @@ A Django and PostgreSQL backend for managing a motorcycle and car parts distribu
 ## Setup
 
 1. Install Python 3.11+ and PostgreSQL.
-2. Install dependencies:
+2. Create and activate a virtual environment:
+
+   ```bash
+   python -m venv .venv
+   ```
+
+   Windows PowerShell:
+
+   ```powershell
+   .venv\Scripts\Activate.ps1
+   ```
+
+3. Install dependencies:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Configure the required environment variables using `.env.example` as a reference: `DATABASE_URL`, `SUPPLIER_API_URL`, and `SUPPLIER_API_KEY`.
-4. Apply migrations:
+4. Configure the required environment variables using `.env.example` as a reference:
+
+   - `DATABASE_URL`
+   - `SUPPLIER_API_URL`
+   - `SUPPLIER_API_KEY`
+
+   Use your own local values. Do not commit real credentials.
+
+5. Apply migrations:
 
    ```bash
-   python manage.py migrate --noinput
+   python manage.py migrate
    ```
 
-5. Seed the database:
+6. Seed the database:
 
    ```bash
    python manage.py seed_data
    ```
 
-6. Start the server:
+   The seed command can be run again to verify that seeding does not duplicate the seeded catalogue or dealer records.
 
-   ```bash
-   python manage.py runserver
-   ```
+## Run the Application
+
+Start the supplier mock in one terminal:
+
+```bash
+python supplier_mock/mock_supplier.py
+```
+
+Configure `SUPPLIER_API_URL` and `SUPPLIER_API_KEY` to match the mock service's printed values.
+
+Start Django in another terminal:
+
+```bash
+python manage.py runserver
+```
 
 ## Testing
 
@@ -70,17 +99,13 @@ Run the Django system check:
 python manage.py check
 ```
 
-Run the Django-track smoke test against a running, freshly seeded database:
+With Django and the supplier mock running, execute:
 
 ```bash
 python smoke_test.py --base-url http://127.0.0.1:8000 --track django
 ```
 
-Start the supplier mock with:
-
-```bash
-python supplier_mock/mock_supplier.py
-```
+The final recorded smoke-test run passed all 9 checks. This verifies the tested API basics, but does not guarantee that every hidden evaluation requirement has been satisfied.
 
 ## Documentation
 
@@ -88,8 +113,5 @@ See `API_CONTRACT.md` for endpoint specifications and `DECISIONS.md` for design 
 
 ## Walkthrough Video
 
-Add your unlisted YouTube, Loom, or Google Drive walkthrough link here after recording the five-minute video.
+**Video link:** Add the URL to your five-minute code walkthrough here after uploading it.
 
-## Known Issues
-
-Supplier synchronization remains unverified because it returns HTTP 502 during testing. This should be investigated further.
