@@ -1,41 +1,95 @@
-# DealerDesk starter
+# VIKMO DealerDesk
 
-A minimal Django project that already follows the run contract. It has **no models and no business logic**: designing those is the assignment.
+**Track: django**
 
-What's here:
+A Django and PostgreSQL backend for managing a motorcycle and car parts distributor's catalogue, dealers, orders, and supplier integration.
 
-- `dealerdesk/settings.py` reads `DATABASE_URL`, `SUPPLIER_API_URL`, `SUPPLIER_API_KEY` and the LLM keys (Gemini, OpenAI, Anthropic, Groq), refuses anything but PostgreSQL, and turns off authentication for the API.
-- `GET /api/health/` returns `{"status": "ok"}`.
-- `python manage.py seed_data` exists but does nothing yet.
-- `requirements.txt` with Django, DRF, the Postgres driver and `requests`. Add your LLM provider's SDK if you build the assistant.
+## Implemented Components
 
-## Set up
+- Product catalogue and dealer APIs
+- Draft order creation and retrieval
+- Order validation and lifecycle handling
+- Inventory and GST calculations
+- Supplier catalogue synchronization with pagination and retry handling
+- Consistent JSON API error responses
 
-1. Copy everything in this folder into the root of your repo, next to `data/`.
-2. Get a PostgreSQL database:
-   - **Hosted, free:** create a project on neon.tech or supabase.com and copy its connection string, or
-   - **Local:** install PostgreSQL and run `createdb dealerdesk`.
-3. Copy `.env.example` to `.env` and fill in `DATABASE_URL` (and your LLM key if you build the assistant).
-4. Install and run:
+**Known limitation:** Supplier synchronization currently returns HTTP 502 during testing and needs further verification.
+
+## Technology Stack
+
+- Python 3.11+
+- Django 5.2
+- PostgreSQL
+- Django ORM
+- Requests
+
+## Project Structure
+
+- `core/` — models, API views, URLs, and management commands
+- `dealerdesk/` — Django project configuration
+- `data/` — catalogue and supporting CSV datasets
+- `supplier_mock/` — supplier API mock
+- `ml/` — ML-related documentation
+- `smoke_test.py` — API smoke tests
+- `API_CONTRACT.md` — API specification
+- `DECISIONS.md` — design decisions
+
+## Setup
+
+1. Install Python 3.11+ and PostgreSQL.
+2. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Configure the required environment variables using `.env.example` as a reference: `DATABASE_URL`, `SUPPLIER_API_URL`, and `SUPPLIER_API_KEY`.
+4. Apply migrations:
+
+   ```bash
+   python manage.py migrate --noinput
+   ```
+
+5. Seed the database:
+
+   ```bash
+   python manage.py seed_data
+   ```
+
+6. Start the server:
+
+   ```bash
+   python manage.py runserver
+   ```
+
+## Testing
+
+Run the Django system check:
 
 ```bash
-python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py seed_data
-python manage.py runserver 0.0.0.0:8000
+python manage.py check
 ```
 
-5. Check it: `curl http://localhost:8000/api/health/` → `{"status": "ok"}`
-
-## Before you submit
-
-Reset to a fresh database, seed twice, and run the smoke test from the bundle:
+Run the Django-track smoke test against a running, freshly seeded database:
 
 ```bash
-python smoke_test.py --base-url http://localhost:8000 --track django   # or --track aiml
+python smoke_test.py --base-url http://127.0.0.1:8000 --track django
 ```
 
-Add new packages to `requirements.txt` as you go. The grader installs it on Linux with Python 3.11+.
+Start the supplier mock with:
 
-Docker is optional. If you add a `Dockerfile` or `docker-compose.yml` for yourself, keep the plain commands above working too: the grader uses those, not Docker.
+```bash
+python supplier_mock/mock_supplier.py
+```
+
+## Documentation
+
+See `API_CONTRACT.md` for endpoint specifications and `DECISIONS.md` for design decisions.
+
+## Walkthrough Video
+
+Add your unlisted YouTube, Loom, or Google Drive walkthrough link here after recording the five-minute video.
+
+## Known Issues
+
+Supplier synchronization remains unverified because it returns HTTP 502 during testing. This should be investigated further.
